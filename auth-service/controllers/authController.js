@@ -13,8 +13,11 @@ exports.register = async (req, res) => {
     await newUser.save();
 
     res.status(201).json({ message: 'Compte créé avec succès' });
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur serveur' });
+  } catch (error) {
+   if (error.name === 'ValidationError') {
+    return res.status(400).json({ message: error.message });
+  }
+  res.status(500).json({ message: 'Erreur serveur' });
   }
 };
 
@@ -23,7 +26,7 @@ exports.login = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Utilisateur introuvable' });
+    if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Mot de passe incorrect' });

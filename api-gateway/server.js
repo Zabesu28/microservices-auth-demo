@@ -1,29 +1,24 @@
 const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const proxy = require('express-http-proxy');
 const cors = require('cors');
+const dotenv = require('dotenv');
 
+dotenv.config();
 const app = express();
 app.use(cors());
 
-// Proxy vers le microservice auth
-app.use('/auth', createProxyMiddleware({
-  target: 'http://localhost:5000',
-  changeOrigin: true,
-  pathRewrite: { '^/auth': '' },
-  logLevel: 'debug',
-  onProxyReq: (proxyReq, req) => {
-    // Important : reconstruire le body pour que le proxy le passe bien
-    if (req.body) {
-      const formData = new URLSearchParams(req.body).toString();
-      proxyReq.setHeader('Content-Type', 'application/json');
-      proxyReq.setHeader('Content-Length', Buffer.byteLength(formData));
-      proxyReq.write(formData);
-      proxyReq.end();
-    }
+// Pas de body-parser ici pour ne pas interférer avec le proxy
+
+app.use('/auth', proxy(process.env.AUTH_SERVICE_URL, {
+  proxyReqPathResolver: req => req.originalUrl.replace('/auth', ''),
+  proxyErrorHandler: (err, res, next) => {
+    console.error('[GATEWAY] Erreur proxy :', err.message);
+    res.status(500).json({ error: 'Erreur proxy' });
   }
 }));
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000
+
 app.listen(PORT, () => {
-  console.log(`API Gateway lancé sur le port ${PORT}`);
+  console.log('Gateway lancé sur le port ' + PORT);
 });
