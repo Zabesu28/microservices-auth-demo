@@ -7,10 +7,8 @@ dotenv.config();
 const app = express();
 app.use(cors());
 
-// Pas de body-parser ici pour ne pas interférer avec le proxy
-
 app.use('/auth', proxy(process.env.AUTH_SERVICE_URL, {
-  proxyReqPathResolver: req => req.originalUrl.replace('/auth', ''),
+  proxyReqPathResolver: req => req.url, 
   proxyErrorHandler: (err, res, next) => {
     console.error('[GATEWAY] Erreur proxy :', err.message);
     res.status(500).json({ error: 'Erreur proxy' });
