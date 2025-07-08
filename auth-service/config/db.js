@@ -8,7 +8,7 @@ const connectDB = async () => {
     console.log('MongoDB connecté');
   } catch (error) {
     console.error('Erreur MongoDB :', error);
-    process.exit(1);
+    await new Promise(res => setTimeout(res, 3000));
   }
 };
 

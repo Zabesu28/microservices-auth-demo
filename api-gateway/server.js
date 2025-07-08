@@ -15,7 +15,7 @@ app.use('/auth', proxy(process.env.AUTH_SERVICE_URL, {
   }
 }));
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.GATEWAY_PORT || 3000
 
 app.listen(PORT, () => {
   console.log('Gateway lancé sur le port ' + PORT);

@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - backend
+
+  auth-service:
+    build: ./auth-service
+    restart: unless-stopped
+    env_file:
+      - auth-service/.env
+    depends_on:
+      - mongo
+    networks:
+      - backend
+    volumes:
+      - ./auth-service/uploads:/app/uploads
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    restart: unless-stopped
+    env_file:
+      - api-gateway/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+    networks:
+      - backend
+
+volumes:
+  mongo-data:
+
+networks:
+  backend:
+    driver: bridge
