@@ -13,11 +13,9 @@ exports.register = async (req, res) => {
     await newUser.save();
 
     res.status(201).json({ message: 'Compte créé avec succès' });
-  } catch (error) {
-   if (error.name === 'ValidationError') {
-    return res.status(400).json({ message: error.message });
-  }
-  res.status(500).json({ message: 'Erreur serveur' });
+   } catch (error) {
+    console.error('[REGISTER ERROR]', error);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -34,7 +32,8 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.json({ token });
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur serveur' });
+  } catch (error) {
+    console.error('[LOGIN ERROR]', error);
+    res.status(500).json({ message: error.message });
   }
 };
