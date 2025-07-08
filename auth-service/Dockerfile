@@ -12,4 +12,4 @@ ENV PORT=5000
 
 EXPOSE 5000
 
-CMD ["nodemon", "index.js"]
+CMD ["nodemon", "server.js"]
