@@ -19,7 +19,8 @@ services:
     networks:
       - backend
     volumes:
-      - ./auth-service/uploads:/app/uploads
+      - ./auth-service:/app
+      - /app/node_modules
 
   api-gateway:
     build: ./api-gateway
@@ -39,4 +40,3 @@ volumes:
 
 networks:
   backend:
-    driver: bridge

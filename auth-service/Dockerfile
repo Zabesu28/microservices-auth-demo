@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
+RUN npm install -g nodemon
 
 COPY . .
 
@@ -11,4 +12,4 @@ ENV PORT=5000
 
 EXPOSE 5000
 
-CMD ["node", "server.js"]
+CMD ["nodemon", "index.js"]
