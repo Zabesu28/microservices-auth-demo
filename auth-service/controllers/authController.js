@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Mot de passe incorrect' });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.json({ token });
   } catch (error) {
@@ -39,17 +39,6 @@ exports.login = async (req, res) => {
 };
 
 exports.getUserInfoFromToken = async (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ message: 'Token manquant' });
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('_id role');
-
-    if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
-
-    res.json({ id: user._id, role: user.role });
-  } catch (error) {
-    res.status(401).json({ message: 'Token invalide', error: error.message });
-  }
+  const { id, role } = req.user;
+  res.json({ id, role });
 };
