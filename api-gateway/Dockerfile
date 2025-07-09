@@ -12,4 +12,4 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["nodemon", "server.js"]
+CMD ["nodemon", "--legacy-watch", "server.js"]
