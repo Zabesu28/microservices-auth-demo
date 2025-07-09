@@ -4,12 +4,12 @@ const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
     console.log('[DEBUG register]', req.body);
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
   try {
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ email, password: hashedPassword });
+    const newUser = new User({ email, password: hashedPassword, role: role || 'user' });
     await newUser.save();
 
     res.status(201).json({ message: 'Compte créé avec succès' });
@@ -35,5 +35,21 @@ exports.login = async (req, res) => {
   } catch (error) {
     console.error('[LOGIN ERROR]', error);
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getUserInfoFromToken = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'Token manquant' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('_id role');
+
+    if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
+
+    res.json({ id: user._id, role: user.role });
+  } catch (error) {
+    res.status(401).json({ message: 'Token invalide', error: error.message });
   }
 };

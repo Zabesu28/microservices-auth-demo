@@ -1,0 +1,17 @@
+{
+  "name": "microservice-products",
+  "version": "1.0.0",
+  "description": "A microsevice for products",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --legacy-watch server.js"
+  },
+  "author": "Wyona",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.1"
+  }
+}

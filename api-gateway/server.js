@@ -2,12 +2,21 @@ const express = require('express');
 const proxy = require('express-http-proxy');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const adminMiddleware = require('./middlewares/adminMiddleware');
 
 dotenv.config();
 const app = express();
 app.use(cors());
 
 app.use('/auth', proxy(process.env.AUTH_SERVICE_URL, {
+  proxyReqPathResolver: req => req.url, 
+  proxyErrorHandler: (err, res, next) => {
+    console.error('[GATEWAY] Erreur proxy :', err.message);
+    res.status(500).json({ error: 'Erreur proxy' });
+  }
+}));
+
+app.use('/products', adminMiddleware, proxy(process.env.PRODUCTS_SERVICE_URL, {
   proxyReqPathResolver: req => req.url, 
   proxyErrorHandler: (err, res, next) => {
     console.error('[GATEWAY] Erreur proxy :', err.message);

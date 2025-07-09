@@ -8,6 +8,13 @@ services:
       - mongo-data:/data/db
     networks:
       - backend
+  mongo-products:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongo-products-data:/data/db
+    networks:
+      - backend
 
   auth-service:
     build: ./auth-service
@@ -22,6 +29,19 @@ services:
       - ./auth-service:/app
       - /app/node_modules
 
+  products-service:
+    build: ./microservices-products
+    restart: unless-stopped
+    env_file:
+      - microservices-products/.env
+    depends_on:
+      - mongo-products
+    networks:
+      - backend
+    volumes:
+      - ./microservices-products:/app
+      - /app/node_modules
+
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
@@ -32,6 +52,7 @@ services:
       - "3000:3000"
     depends_on:
       - auth-service
+      - products-service
     networks:
       - backend
     volumes:
@@ -40,6 +61,7 @@ services:
 
 volumes:
   mongo-data:
+  mongo-products-data:
 
 networks:
   backend:
